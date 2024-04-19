@@ -1,0 +1,95 @@
+inventory = {
+    "apples": {'quantity': 50, 'min_stock': 10},
+    "bananas": {'quantity': 30, 'min_stock': 15},
+    "oranges": {'quantity': 20, 'min_stock': 5},
+}
+
+def add_item(name: str, quantity: int, min_stock: int) -> None:
+    """
+    Add or update an item in the inventory
+    :param name:
+    :param quantity:
+    :param min_stock:
+    :return:
+    """
+    if name in inventory:
+        inventory[name]['quantity'] += quantity
+        inventory[name]['min_stock'] = min_stock
+        print(f"{quantity} {name} added. Total: {inventory[name]['quantity']}")
+    else:
+        inventory[name] = {'quantity': quantity, "min_stock": min_stock}
+        print(f'{name} added to inventory with quantity {quantity}')
+
+def search_item(name: str) -> None:
+    """
+    Search for an item in the inventory and display its details
+    :param name:
+    :return:
+    """
+    if name in inventory:
+        item_details = inventory[name]
+        print(f"Items: {name}, Quantity: {item_details['quantity']}, Min Stock: {item_details['min_stock']}")
+    else:
+        print(f"{name} not found in the inventory")
+
+def list_inventory() -> None:
+    for item, details in inventory.items():
+        print(f"Item: {item}, Quantity: {details['quantity']}, Min Stock: {details['min_stock']}")
+
+def remove_item(name: str, quantity: int = 1) -> None:
+    if name in inventory and inventory[name]['quantity'] >= quantity:
+        inventory[name]['quantity'] -= quantity
+        print(f"{quantity} {name} removed. Remaining: {inventory[name]['quantity']}")
+        if inventory[name]['quantity'] < inventory[name]['min_stock']:
+            print(f"Warning: {name} is below minimum stock level.")
+    else:
+        print(f'Error: Insufficient {name} in inventory or item not found')
+
+def find_most_stocked_item() -> tuple[str, int]:
+    """
+    Find and return the item with the highest quantity in the inventory.
+    :return:
+    """
+    quantities_items = [(details['quantity'], item) for item, details in inventory.items()]
+    highest_quantity, most_stocked_item = max(quantities_items)
+
+    return most_stocked_item, highest_quantity
+
+def find_least_stocked_item() -> tuple[str, int]:
+    """
+    Find and return the item with the least quantity in the inventory.
+    :return:
+    """
+    quantities_items = [(details['quantity'], item) for item, details in inventory.items()]
+    lowest_quantity, least_stocked_item = min(quantities_items)
+
+    return least_stocked_item, lowest_quantity
+
+def calculate_total_inventory_value(item_value: float) -> float:
+    """
+    Calculate and return the total values of the inventory, assuming each item has the same price
+    :param item_value:
+    :return:
+    """
+    total_quantity = sum(item['quantity'] for item in inventory.values())
+    return total_quantity
+
+add_item('apples', 20, 7)
+add_item('cherries', 40, 60)
+# print(inventory)
+
+remove_item('bananas', 5)
+remove_item('apples')
+remove_item('apples', 500)
+remove_item('pineapples')
+
+# search_item('oranges')
+
+list_inventory()
+
+print('-' * 50)
+print(find_most_stocked_item())
+print(find_least_stocked_item())
+
+print('-' * 50)
+print(calculate_total_inventory_value(5.2))
