@@ -1,0 +1,121 @@
+import json
+
+import BasicInventorySystem as inventorySystem
+
+inventory = inventorySystem.inventory
+
+def generate_restock_orders() -> dict:
+    """
+    Generate restock orders from items with quantities at or below their minimum stock level
+    :return:
+    """
+    restock_orders = {}
+    for item, details in inventory.items():
+        if details['quantity'] <= details['min_stock']:
+            order_quantity = (details['min_stock'] * 2) - details['quantity']
+            restock_orders[item] = order_quantity
+            print(f"Restock Order: {item} - Order Quantity: {order_quantity}")
+
+    return restock_orders
+
+
+def apply_restock_orders(restock_orders: dict) -> None:
+    """
+    Apply the restocking orders to update the inventory system quantities
+    :param restock_orders:
+    :return:
+    """
+    for item, order_quantity in restock_orders.items():
+        if item in inventory:
+            inventory[item]['quantity'] += order_quantity
+            print(f"Applied Restock: {item} - New Quantity: {inventory[item]['quantity']}")
+
+
+def save_inventory_to_file(file_path=r'Exercise 7 - Inventory System Files\Inventory.json') -> None:
+    """
+    Save the current inventory to a JSON file
+    :param file_path:
+    :return:
+    """
+    with open(file_path, 'w') as file:
+        json.dump(inventory, file, indent=4)
+    print("Inventory saved to file.")
+
+
+def load_inventory_from_file(file_path=r'Exercise 7 - Inventory System Files\Advanced Inventory.json') -> None:
+    """
+    Load inventory data from JSON file into the inventory dictionary
+    :param file_path:
+    :return:
+    """
+    try:
+        with open(file_path, 'r') as file:
+            global inventory
+            inventory = json.load(file)
+        print('Inventory file loaded from file.')
+    except FileNotFoundError:
+        print("Inventory file not found. Starting with an empty inventory.")
+        inventory = {}
+
+
+def inventory_report(inventory: dict) -> None:
+    print('Inventory Report')
+    for category, items in inventory.items():
+        print(f"Category: {category} - Total items: {len(items)}")
+        for item in items:
+            print(f"\tItem: {item['name']}, Quantity: {item['quantity']}, Min Stock: {item['min_stock']}")
+
+
+def supplier_contact_list(inventory: dict) -> None:
+    print('Supplier Contact list:')
+    suppliers = {}
+    for category, items in inventory.items():
+        for item in items:
+            supplier_name = item['supplier']['name']
+            if supplier_name not in suppliers:
+                suppliers[supplier_name] = item['supplier']['contact']
+
+    for name, contact in suppliers.items():
+        print(f'\tSupplier: {name}, Contact: {contact}')
+
+
+def cost_and_value_analysis(inventory: dict) -> None:
+    total_cost = 0
+    potential_revenue = 0
+    for category, items in inventory.items():
+        for item in items:
+            cost = item['quantity'] * item['price']
+            revenue = cost * 1.5
+            total_cost += cost
+            potential_revenue += revenue
+    print(f"Total Cost: ${total_cost}")
+    print(f"Potential Revenue: ${potential_revenue}")
+
+
+load_inventory_from_file()
+print(inventory)
+
+print()
+inventory_report(inventory)
+
+print()
+supplier_contact_list(inventory)
+
+print()
+cost_and_value_analysis(inventory)
+
+# inventorySystem.add_item('apples', 20, 10)
+# inventorySystem.add_item('cherries', 40, 60)
+# inventorySystem.add_item('pineapples', 10, 30)
+# print()
+# orders = generate_restock_orders()
+#
+# print()
+# apply_restock_orders(orders)
+#
+# print()
+# inventorySystem.list_inventory()
+#
+# print()
+# save_inventory_to_file()
+
